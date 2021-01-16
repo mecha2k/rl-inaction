@@ -86,7 +86,7 @@ def running_mean(x, batch_size=50):
     return y
 
 
-def train(env, model, loss_fn, arms=10, epochs=5000, learning_rate=1e-2):
+def train(env, model, loss_fn, arms=10, epochs=1000, learning_rate=1e-2):
     cur_state = torch.Tensor(one_hot(arms, env.get_state()))
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     rewards = []
@@ -192,6 +192,14 @@ def rl_context_bandit():
     rewards = train(env, model, loss_fn, arms=arms)
     plt.plot(running_mean(rewards, batch_size=batch_size))
     plt.show()
+
+    results = []
+    for state in range(arms):
+        cur_state = torch.Tensor(one_hot(arms, state))
+        y_pred = model(cur_state)
+        av_softmax = softmax(y_pred.data.numpy())
+        results.append(av_softmax.tolist())
+    print(results)
 
 
 if __name__ == "__main__":
